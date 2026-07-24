@@ -1,0 +1,120 @@
+/* Injects Tailwind's base styles (resets, Normalize.css) */
+@tailwind base;
+
+/* Injects any custom or built-in component styles */
+@tailwind components;
+
+/* Injects all utility classes (e.g., p-4, text-center) */
+@tailwind utilities;
+
+/* Lenis smooth-scroll (only active on pages that mount <SmoothScroll>) */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* Audience scroll section — stack the panels vertically for reduced motion
+   (no pin/scrub), so all the copy stays readable. */
+.audience-section.reduce-stack {
+  height: auto;
+}
+.audience-section.reduce-stack .audience-panel {
+  position: relative;
+  opacity: 1 !important;
+  visibility: visible !important;
+  min-height: 100vh;
+}
+
+/* Audio toggle — animated equalizer bars (gold, matching the RRU theme) */
+.sound-wave {
+  display: flex;
+  align-items: center;
+  gap: 2.5px;
+  height: 18px;
+}
+.sound-wave i {
+  width: 3px;
+  height: 100%;
+  border-radius: 2px;
+  background: #f5c518;
+  transform: scaleY(0.25);
+  transform-origin: center;
+}
+.sound-wave.is-playing i {
+  animation: sound-wave-bar 0.9s ease-in-out infinite;
+}
+.sound-wave.is-playing i:nth-child(1) {
+  animation-delay: 0s;
+}
+.sound-wave.is-playing i:nth-child(2) {
+  animation-delay: 0.18s;
+}
+.sound-wave.is-playing i:nth-child(3) {
+  animation-delay: 0.36s;
+}
+.sound-wave.is-playing i:nth-child(4) {
+  animation-delay: 0.12s;
+}
+@keyframes sound-wave-bar {
+  0%,
+  100% {
+    transform: scaleY(0.25);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sound-wave.is-playing i {
+    animation: none;
+    transform: scaleY(0.7);
+  }
+}
+
+/* Hero headline ripple — light concentric pulses expanding from behind the text */
+.hero-ring {
+  position: absolute;
+  height: 46vmin;
+  width: 46vmin;
+  border-radius: 9999px;
+  border: 2px solid rgba(255, 240, 214, 0.2);
+  opacity: 0;
+  animation: hero-ripple 4.5s ease-out infinite;
+}
+.hero-ring:nth-child(2) {
+  animation-delay: 1.5s;
+}
+.hero-ring:nth-child(3) {
+  animation-delay: 3s;
+}
+@keyframes hero-ripple {
+  0% {
+    transform: scale(0.45);
+    opacity: 0;
+  }
+  14% {
+    opacity: 0.42;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-ring {
+    animation: none;
+    opacity: 0;
+  }
+}
