@@ -119,6 +119,23 @@ html.lenis body {
   }
 }
 
+/* Bass visualizer — the red "subwoofer" glow behind the headline pumps to the
+   live low-frequency energy of the track. AudioPlayer publishes `--bass` (0..1)
+   on <html> every frame; the glow scales, brightens and fades with it, so it
+   physically thumps to the music's bass. Turn sound on (top-right) to hear +
+   see it react. `--bass` idles at a gentle breath when sound is off. */
+.hero-bass {
+  transform: translate(-50%, -50%) scale(calc(1 + var(--bass, 0.1) * 0.5));
+  opacity: calc(0.26 + var(--bass, 0.1) * 0.6);
+  filter: brightness(calc(1 + var(--bass, 0) * 0.7));
+  will-change: transform, opacity, filter;
+}
+/* The ripple gets a small bass-driven push too, so the rings feel kicked out
+   on each beat. */
+.hero-ripple {
+  transform: scale(calc(1 + var(--bass, 0) * 0.14));
+}
+
 /* Scroll-down cue — a mouse outline with a dot that drops, plus a gentle bob. */
 .scroll-cue {
   animation: scroll-cue-bob 2.4s ease-in-out infinite;

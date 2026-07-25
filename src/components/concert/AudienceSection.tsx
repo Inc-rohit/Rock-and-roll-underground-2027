@@ -63,24 +63,19 @@ const PANELS = [
     },
 ];
 
-// Photo placeholders clustered TIGHT around the "16th Annual" title — hugging
-// its top, sides and bottom, deliberately overlapping/stacked. They sit behind
-// the text (z-0 under z-10) so the title stays fully legible on top. Swap the
-// inner icon box for a real <img>/<video> later.
+// 8 photo placeholders arranged in a RING (ellipse) around the "16th Annual"
+// title — top, the four diagonals, both sides and bottom, evenly spaced. They
+// sit behind the text (z-0 under z-10) so the title stays fully legible. Swap
+// the inner icon box for a real <img>/<video> later.
 const SHOTS = [
-    // top — clustered across, overlapping each other
-    { pos: "left-[19vw] top-[7vh]", rot: -8, size: "h-40 w-56" },
-    { pos: "left-[33vw] top-[2vh]", rot: 5, size: "h-40 w-56" },
-    { pos: "right-[33vw] top-[3vh]", rot: -5, size: "h-40 w-56" },
-    { pos: "right-[19vw] top-[8vh]", rot: 8, size: "h-40 w-56" },
-    // sides — stacked pairs hugging the title left / right
-    { pos: "left-[6vw] top-[33vh]", rot: 7, size: "h-40 w-56" },
-    { pos: "left-[8vw] top-[49vh]", rot: -6, size: "h-40 w-56" },
-    { pos: "right-[6vw] top-[35vh]", rot: -7, size: "h-40 w-56" },
-    { pos: "right-[8vw] top-[51vh]", rot: 6, size: "h-40 w-56" },
-    // bottom — overlapping across the lower-centre
-    { pos: "left-[37vw] bottom-[2vh]", rot: -6, size: "h-40 w-56" },
-    { pos: "right-[37vw] bottom-[3vh]", rot: 6, size: "h-40 w-56" },
+    { pos: "left-[40vw] top-[2vh]", rot: -3, size: "h-48 w-72" }, // top
+    { pos: "left-[65vw] top-[12vh]", rot: 6, size: "h-48 w-72" }, // top-right
+    { pos: "left-[76vw] top-[36vh]", rot: 5, size: "h-48 w-72" }, // right
+    { pos: "left-[65vw] top-[60vh]", rot: 7, size: "h-48 w-72" }, // bottom-right
+    { pos: "left-[40vw] top-[75vh]", rot: 3, size: "h-48 w-72" }, // bottom
+    { pos: "left-[15vw] top-[60vh]", rot: -7, size: "h-48 w-72" }, // bottom-left
+    { pos: "left-[4vw] top-[36vh]", rot: -5, size: "h-48 w-72" }, // left
+    { pos: "left-[15vw] top-[12vh]", rot: -6, size: "h-48 w-72" }, // top-left
 ];
 
 export default function AudienceSection() {
@@ -136,6 +131,18 @@ export default function AudienceSection() {
                 if (i === 0) {
                     const glow = panel.querySelector(".aud-glow");
                     const shots = gsap.utils.toArray<HTMLElement>(".aud-shot", panel);
+                    // Each ring photo's offset toward screen centre, so they can
+                    // BURST out of the headline into the ring (and implode back on
+                    // exit).
+                    const vw2 = window.innerWidth / 2;
+                    const vh2 = window.innerHeight / 2;
+                    const shotCenters = shots.map((el) => {
+                        const r = el.getBoundingClientRect();
+                        return {
+                            dx: (vw2 - (r.left + r.width / 2)) * 0.92,
+                            dy: (vh2 - (r.top + r.height / 2)) * 0.92,
+                        };
+                    });
                     // Main event name — big cinematic bloom-in (long, so it reads clearly).
                     tl.fromTo(
                         glow,
@@ -173,20 +180,29 @@ export default function AudienceSection() {
                         { autoAlpha: 1, yPercent: 0, duration: 0.6, ease: "power2.out" },
                         ">-0.2",
                     );
-                    // Photo placeholders toss in around the title (resting angles
-                    // are inline; GSAP only tweens scale/alpha so they're kept).
+                    // Photos BURST out of the headline into the ring — each flies
+                    // from screen centre to its spot with a spin, one after another
+                    // around the circle.
                     tl.fromTo(
                         shots,
-                        { autoAlpha: 0, scale: 0.6, yPercent: 18 },
+                        {
+                            autoAlpha: 0,
+                            scale: 0.12,
+                            x: (i: number) => shotCenters[i].dx,
+                            y: (i: number) => shotCenters[i].dy,
+                            rotation: (i: number) => SHOTS[i].rot + (i % 2 ? 55 : -55),
+                        },
                         {
                             autoAlpha: 1,
                             scale: 1,
-                            yPercent: 0,
-                            duration: 0.5,
-                            ease: "back.out(1.6)",
-                            stagger: 0.08,
+                            x: 0,
+                            y: 0,
+                            rotation: (i: number) => SHOTS[i].rot,
+                            duration: 0.75,
+                            ease: "back.out(1.5)",
+                            stagger: { each: 0.07, from: "start" },
                         },
-                        "<0.1",
+                        "<0.05",
                     );
                     tl.to(panel, { duration: 0.9 }); // hold
                     // clear zoom-through exit
@@ -194,7 +210,20 @@ export default function AudienceSection() {
                     tl.to(sub, { scale: 1.4, autoAlpha: 0, duration: 0.9, ease: "power2.in" }, "introExit");
                     tl.to(eyebrow, { autoAlpha: 0, yPercent: -45, duration: 0.6 }, "introExit");
                     tl.to(items, { autoAlpha: 0, yPercent: -25, duration: 0.6 }, "introExit");
-                    tl.to(shots, { autoAlpha: 0, scale: 0.85, duration: 0.6 }, "introExit");
+                    tl.to(
+                        shots,
+                        {
+                            autoAlpha: 0,
+                            scale: 0.12,
+                            x: (i: number) => shotCenters[i].dx,
+                            y: (i: number) => shotCenters[i].dy,
+                            rotation: (i: number) => SHOTS[i].rot + (i % 2 ? -45 : 45),
+                            duration: 0.7,
+                            ease: "power2.in",
+                            stagger: { each: 0.05, from: "end" },
+                        },
+                        "introExit",
+                    );
                     tl.to(glow, { autoAlpha: 0, scale: 1.7, duration: 0.9 }, "introExit");
                     tl.set(panel, { autoAlpha: 0 });
                     return;
@@ -391,26 +420,14 @@ export default function AudienceSection() {
                                             className={`aud-shot absolute ${s.pos}`}
                                             style={{ transform: `rotate(${s.rot}deg)` }}
                                         >
-                                            <div className="rounded-md border border-white/20 bg-white/[0.06] p-2 shadow-[0_14px_44px_rgba(0,0,0,0.6)] backdrop-blur-[2px]">
-                                                <div
-                                                    className={`flex ${s.size} items-center justify-center rounded-sm border border-dashed border-[#f4c020]/40 bg-gradient-to-br from-white/[0.12] to-white/[0.02]`}
-                                                >
-                                                    <svg
-                                                        width="38"
-                                                        height="38"
-                                                        viewBox="0 0 24 24"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        strokeWidth="1.4"
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        className="text-white/45"
-                                                    >
-                                                        <rect x="3" y="4" width="18" height="16" rx="2" />
-                                                        <circle cx="8.5" cy="9" r="1.6" />
-                                                        <path d="M21 16l-5-5L5 20" />
-                                                    </svg>
-                                                </div>
+                                            <div className="overflow-hidden rounded-md border border-white/20 bg-white/[0.06] p-1.5 shadow-[0_14px_44px_rgba(0,0,0,0.6)] backdrop-blur-[2px]">
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img
+                                                    src={`/stage/${i + 1}.jpg`}
+                                                    alt=""
+                                                    loading="lazy"
+                                                    className={`${s.size} rounded-sm object-cover`}
+                                                />
                                             </div>
                                         </div>
                                     ))}

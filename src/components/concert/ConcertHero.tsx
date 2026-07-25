@@ -340,6 +340,16 @@ export default function ConcertHero() {
             <ScrollSequence>
                 <SequencePanel>
                     <div className="hero-intro relative isolate flex items-center justify-center px-6 text-center">
+                        {/* bass pulse — a red "subwoofer" glow that throbs on the
+                            beat behind the headline, in rhythm with the ripple */}
+                        <div
+                            aria-hidden="true"
+                            className="hero-bass pointer-events-none absolute left-1/2 top-1/2 h-[100vh] w-[100vh] rounded-full"
+                            style={{
+                                background:
+                                    "radial-gradient(closest-side, rgba(255,64,24,0.34), rgba(255,96,32,0.12) 46%, rgba(0,0,0,0) 72%)",
+                            }}
+                        />
                         {/* white/gold light burst the headline slams out of */}
                         <div
                             aria-hidden="true"
