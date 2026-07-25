@@ -63,6 +63,26 @@ const PANELS = [
     },
 ];
 
+// Photo placeholders clustered TIGHT around the "16th Annual" title — hugging
+// its top, sides and bottom, deliberately overlapping/stacked. They sit behind
+// the text (z-0 under z-10) so the title stays fully legible on top. Swap the
+// inner icon box for a real <img>/<video> later.
+const SHOTS = [
+    // top — clustered across, overlapping each other
+    { pos: "left-[19vw] top-[7vh]", rot: -8, size: "h-40 w-56" },
+    { pos: "left-[33vw] top-[2vh]", rot: 5, size: "h-40 w-56" },
+    { pos: "right-[33vw] top-[3vh]", rot: -5, size: "h-40 w-56" },
+    { pos: "right-[19vw] top-[8vh]", rot: 8, size: "h-40 w-56" },
+    // sides — stacked pairs hugging the title left / right
+    { pos: "left-[6vw] top-[33vh]", rot: 7, size: "h-40 w-56" },
+    { pos: "left-[8vw] top-[49vh]", rot: -6, size: "h-40 w-56" },
+    { pos: "right-[6vw] top-[35vh]", rot: -7, size: "h-40 w-56" },
+    { pos: "right-[8vw] top-[51vh]", rot: 6, size: "h-40 w-56" },
+    // bottom — overlapping across the lower-centre
+    { pos: "left-[37vw] bottom-[2vh]", rot: -6, size: "h-40 w-56" },
+    { pos: "right-[37vw] bottom-[3vh]", rot: 6, size: "h-40 w-56" },
+];
+
 export default function AudienceSection() {
     const root = useRef<HTMLElement>(null);
 
@@ -101,7 +121,7 @@ export default function AudienceSection() {
                     start: "top top",
                     end: "+=820%",
                     pin: true,
-                    scrub: 1,
+                    scrub: 1.3,
                     anticipatePin: 1,
                 },
             });
@@ -115,6 +135,7 @@ export default function AudienceSection() {
 
                 if (i === 0) {
                     const glow = panel.querySelector(".aud-glow");
+                    const shots = gsap.utils.toArray<HTMLElement>(".aud-shot", panel);
                     // Main event name — big cinematic bloom-in (long, so it reads clearly).
                     tl.fromTo(
                         glow,
@@ -152,12 +173,28 @@ export default function AudienceSection() {
                         { autoAlpha: 1, yPercent: 0, duration: 0.6, ease: "power2.out" },
                         ">-0.2",
                     );
+                    // Photo placeholders toss in around the title (resting angles
+                    // are inline; GSAP only tweens scale/alpha so they're kept).
+                    tl.fromTo(
+                        shots,
+                        { autoAlpha: 0, scale: 0.6, yPercent: 18 },
+                        {
+                            autoAlpha: 1,
+                            scale: 1,
+                            yPercent: 0,
+                            duration: 0.5,
+                            ease: "back.out(1.6)",
+                            stagger: 0.08,
+                        },
+                        "<0.1",
+                    );
                     tl.to(panel, { duration: 0.9 }); // hold
                     // clear zoom-through exit
                     tl.addLabel("introExit");
                     tl.to(sub, { scale: 1.4, autoAlpha: 0, duration: 0.9, ease: "power2.in" }, "introExit");
                     tl.to(eyebrow, { autoAlpha: 0, yPercent: -45, duration: 0.6 }, "introExit");
                     tl.to(items, { autoAlpha: 0, yPercent: -25, duration: 0.6 }, "introExit");
+                    tl.to(shots, { autoAlpha: 0, scale: 0.85, duration: 0.6 }, "introExit");
                     tl.to(glow, { autoAlpha: 0, scale: 1.7, duration: 0.9 }, "introExit");
                     tl.set(panel, { autoAlpha: 0 });
                     return;
@@ -343,9 +380,45 @@ export default function AudienceSection() {
                                     : "items-start px-[7vw] text-left md:px-[10vw]"
                             }`}
                         >
+                            {isIntro && (
+                                <div
+                                    className="pointer-events-none absolute inset-0 z-0 hidden md:block"
+                                    aria-hidden="true"
+                                >
+                                    {SHOTS.map((s, i) => (
+                                        <div
+                                            key={i}
+                                            className={`aud-shot absolute ${s.pos}`}
+                                            style={{ transform: `rotate(${s.rot}deg)` }}
+                                        >
+                                            <div className="rounded-md border border-white/20 bg-white/[0.06] p-2 shadow-[0_14px_44px_rgba(0,0,0,0.6)] backdrop-blur-[2px]">
+                                                <div
+                                                    className={`flex ${s.size} items-center justify-center rounded-sm border border-dashed border-[#f4c020]/40 bg-gradient-to-br from-white/[0.12] to-white/[0.02]`}
+                                                >
+                                                    <svg
+                                                        width="38"
+                                                        height="38"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="1.4"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        className="text-white/45"
+                                                    >
+                                                        <rect x="3" y="4" width="18" height="16" rx="2" />
+                                                        <circle cx="8.5" cy="9" r="1.6" />
+                                                        <path d="M21 16l-5-5L5 20" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                             <div
                                 className={
-                                    isIntro ? "mx-auto w-full max-w-4xl" : "w-full max-w-3xl"
+                                    isIntro ? "relative z-10 mx-auto w-full max-w-4xl" : "w-full max-w-3xl"
                                 }
                             >
                                 {isIntro ? (

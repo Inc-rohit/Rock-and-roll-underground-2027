@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import PageBackdrop from '@/components/concert/PageBackdrop';
 import AudioPlayer from '@/components/AudioPlayer';
 import ConnectWithUs from '@/components/ConnectWithUs';
+import BackToTop from '@/components/BackToTop';
 
 
 const alpino = localFont({
@@ -40,6 +41,7 @@ export default function RootLayout({
         </main>
         <ConnectWithUs />
         <Footer />
+        <BackToTop />
       </body>
     </html>
   );

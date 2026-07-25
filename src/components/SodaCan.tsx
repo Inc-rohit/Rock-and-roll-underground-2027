@@ -20,6 +20,12 @@ const metalMaterial = new THREE.MeshStandardMaterial({
     color: "#bbbbbb",
 });
 
+// The GLTF model reads as a ~12 oz can. A real 16 oz can is taller at the SAME
+// diameter (≈4.83" → ≈6.13"), so we stretch the model vertically by this ratio
+// (Y only — X/Z/diameter unchanged). Applied here so every can — the finale
+// pair, the falling can, and the sliding can — matches automatically.
+const CAN_HEIGHT_RATIO = 1.27;
+
 export type SodaCanProps = {
     flavor?: keyof typeof flavorTextures;
     scale?: number;
@@ -48,7 +54,7 @@ export function SodaCan({
     const label = labels[flavor];
 
     return (
-        <group {...props} dispose={null} scale={scale} rotation={[0, -Math.PI, 0]}>
+        <group {...props} dispose={null} scale={[scale, scale * CAN_HEIGHT_RATIO, scale]} rotation={[0, -Math.PI, 0]}>
             <mesh
                 castShadow
                 receiveShadow

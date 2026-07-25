@@ -31,7 +31,7 @@ export default function Scene({ }: Props) {
                     pin: true,
                     start: "top top",
                     end: "bottom bottom",
-                    scrub: true,
+                    scrub: 1.2,
                 },
             });
 

@@ -59,14 +59,14 @@ function Cans() {
             <group ref={aOuter}>
                 <group ref={aSpin}>
                     <Float speed={1.6} rotationIntensity={0.25} floatIntensity={1.1}>
-                        <SodaCan flavor="monsterGreen" scale={3} />
+                        <SodaCan flavor="monsterGreen" scale={2.6} />
                     </Float>
                 </group>
             </group>
             <group ref={bOuter}>
                 <group ref={bSpin}>
                     <Float speed={1.6} rotationIntensity={0.25} floatIntensity={1.1}>
-                        <SodaCan flavor="monsterGreen" scale={3} />
+                        <SodaCan flavor="monsterGreen" scale={2.6} />
                     </Float>
                 </group>
             </group>

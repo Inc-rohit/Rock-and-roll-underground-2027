@@ -118,3 +118,43 @@ html.lenis body {
     opacity: 0;
   }
 }
+
+/* Scroll-down cue — a mouse outline with a dot that drops, plus a gentle bob. */
+.scroll-cue {
+  animation: scroll-cue-bob 2.4s ease-in-out infinite;
+}
+.scroll-mouse-dot {
+  animation: scroll-cue-dot 1.6s ease-in-out infinite;
+}
+@keyframes scroll-cue-dot {
+  0% {
+    transform: translate(-50%, 0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  60% {
+    transform: translate(-50%, 12px);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, 12px);
+    opacity: 0;
+  }
+}
+@keyframes scroll-cue-bob {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+  }
+  50% {
+    transform: translate(-50%, 6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue,
+  .scroll-mouse-dot {
+    animation: none;
+  }
+}

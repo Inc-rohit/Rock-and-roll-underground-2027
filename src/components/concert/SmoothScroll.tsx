@@ -23,10 +23,19 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
         const lenis = new Lenis({
-            duration: 1.15, // higher = smoother / longer glide
+            duration: 1.5, // higher = smoother / longer glide (was 1.15)
+            // easeOutExpo — a long, soft decel to a stop so the wheel glides
+            // instead of feeling "steppy"/hard.
+            easing: (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)),
             smoothWheel: true,
-            touchMultiplier: 1.4,
+            wheelMultiplier: 1,
+            touchMultiplier: 1.5,
+            syncTouch: true, // smooth momentum on trackpads / touch too
         });
+
+        // Expose the instance so UI (e.g. the back-to-top button) can drive a
+        // smooth programmatic scroll through Lenis instead of fighting it.
+        (window as unknown as { __lenis?: Lenis }).__lenis = lenis;
 
         lenis.on("scroll", ScrollTrigger.update);
 
@@ -37,6 +46,7 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
         return () => {
             gsap.ticker.remove(raf);
             gsap.ticker.lagSmoothing(500, 33);
+            delete (window as unknown as { __lenis?: Lenis }).__lenis;
             lenis.destroy();
         };
     }, []);
