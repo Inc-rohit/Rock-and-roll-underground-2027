@@ -150,9 +150,6 @@ export default function ConcertHero() {
                 },
             });
 
-            // The scroll cue fades out the moment the timeline starts advancing.
-            tl.to(".scroll-cue", { autoAlpha: 0, duration: 0.4, ease: "power1.out" }, 0);
-
             // A full-screen "big text" beat: enter from below → hold → up & fade.
             const beat = (panel: HTMLElement) => {
                 tl.fromTo(panel, { autoAlpha: 0, yPercent: 12 }, { autoAlpha: 1, yPercent: 0, duration: 1 });
@@ -394,19 +391,6 @@ export default function ConcertHero() {
                 </SequencePanel>
             </ScrollSequence>
 
-            {/* Scroll-down cue — sits at the bottom of the first screen and fades
-                the instant the pinned timeline starts advancing. */}
-            <div
-                className="scroll-cue pointer-events-none absolute bottom-[3.5vh] left-1/2 z-[50] flex -translate-x-1/2 flex-col items-center gap-2"
-                aria-hidden="true"
-            >
-                <span className="scroll-mouse relative block h-9 w-6 rounded-full border-2 border-[#f4c020]/80 shadow-[0_0_14px_rgba(244,192,32,0.35)]">
-                    <span className="scroll-mouse-dot absolute left-1/2 top-2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-[#f4c020]" />
-                </span>
-                <span className="[font-family:var(--font-bebas)] text-[0.8rem] uppercase tracking-[0.35em] text-[#f4c020]/90 [text-shadow:0_2px_8px_rgba(0,0,0,0.8)]">
-                    Scroll
-                </span>
-            </div>
         </section>
     );
 }

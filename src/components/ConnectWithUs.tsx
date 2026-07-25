@@ -28,7 +28,7 @@ export default function ConnectWithUs() {
                 <h2 className="[font-family:var(--font-bebas)] uppercase leading-[0.95] tracking-[0.03em] text-[clamp(2.75rem,8vw,5.5rem)] bg-gradient-to-b from-[#fff3cf] via-[#f4c020] to-[#d98200] bg-clip-text text-transparent [filter:drop-shadow(0_3px_14px_rgba(0,0,0,0.6))]">
                     Partner With Us
                 </h2>
-                <p className="max-w-xl text-base text-white/85 [text-shadow:0_2px_12px_rgba(0,0,0,0.9)]">
+                <p className="max-w-2xl text-[clamp(1.2rem,2.5vw,1.65rem)] leading-relaxed text-white/90 [text-shadow:0_2px_12px_rgba(0,0,0,0.9)]">
                     Let&apos;s create an unforgettable rock experience together. Get in
                     touch to discuss sponsorship opportunities and custom brand
                     collaborations.

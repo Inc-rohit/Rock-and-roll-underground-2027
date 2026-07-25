@@ -9,6 +9,7 @@ import PageBackdrop from '@/components/concert/PageBackdrop';
 import AudioPlayer from '@/components/AudioPlayer';
 import ConnectWithUs from '@/components/ConnectWithUs';
 import BackToTop from '@/components/BackToTop';
+import ScrollGuide from '@/components/ScrollGuide';
 
 
 const alpino = localFont({
@@ -41,6 +42,7 @@ export default function RootLayout({
         </main>
         <ConnectWithUs />
         <Footer />
+        <ScrollGuide />
         <BackToTop />
       </body>
     </html>

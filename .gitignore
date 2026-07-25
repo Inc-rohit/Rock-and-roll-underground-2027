@@ -37,3 +37,7 @@ yarn-error.log*
 next-env.d.ts
 # claude code local config
 .claude/
+
+# AI-assistant design skills (local tooling, not part of the site)
+.agents/
+skills-lock.json

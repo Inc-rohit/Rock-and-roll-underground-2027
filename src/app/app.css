@@ -37,52 +37,6 @@ html.lenis body {
   min-height: 100vh;
 }
 
-/* Audio toggle — animated equalizer bars (gold, matching the RRU theme) */
-.sound-wave {
-  display: flex;
-  align-items: center;
-  gap: 2.5px;
-  height: 18px;
-}
-.sound-wave i {
-  width: 3px;
-  height: 100%;
-  border-radius: 2px;
-  background: #f5c518;
-  transform: scaleY(0.25);
-  transform-origin: center;
-}
-.sound-wave.is-playing i {
-  animation: sound-wave-bar 0.9s ease-in-out infinite;
-}
-.sound-wave.is-playing i:nth-child(1) {
-  animation-delay: 0s;
-}
-.sound-wave.is-playing i:nth-child(2) {
-  animation-delay: 0.18s;
-}
-.sound-wave.is-playing i:nth-child(3) {
-  animation-delay: 0.36s;
-}
-.sound-wave.is-playing i:nth-child(4) {
-  animation-delay: 0.12s;
-}
-@keyframes sound-wave-bar {
-  0%,
-  100% {
-    transform: scaleY(0.25);
-  }
-  50% {
-    transform: scaleY(1);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .sound-wave.is-playing i {
-    animation: none;
-    transform: scaleY(0.7);
-  }
-}
-
 /* Hero headline ripple — light concentric pulses expanding from behind the text */
 .hero-ring {
   position: absolute;
@@ -136,42 +90,23 @@ html.lenis body {
   transform: scale(calc(1 + var(--bass, 0) * 0.14));
 }
 
-/* Scroll-down cue — a mouse outline with a dot that drops, plus a gentle bob. */
-.scroll-cue {
-  animation: scroll-cue-bob 2.4s ease-in-out infinite;
+/* Scroll-to-explore prompt — a bouncing double chevron so first-time visitors
+   immediately see the page is a long scroll experience. */
+.scroll-hint-arrow {
+  display: block;
+  animation: scroll-hint-bounce 1.5s ease-in-out infinite;
 }
-.scroll-mouse-dot {
-  animation: scroll-cue-dot 1.6s ease-in-out infinite;
-}
-@keyframes scroll-cue-dot {
-  0% {
-    transform: translate(-50%, 0);
-    opacity: 0;
-  }
-  15% {
-    opacity: 1;
-  }
-  60% {
-    transform: translate(-50%, 12px);
-    opacity: 0;
-  }
-  100% {
-    transform: translate(-50%, 12px);
-    opacity: 0;
-  }
-}
-@keyframes scroll-cue-bob {
+@keyframes scroll-hint-bounce {
   0%,
   100% {
-    transform: translate(-50%, 0);
+    transform: translateY(0);
   }
   50% {
-    transform: translate(-50%, 6px);
+    transform: translateY(9px);
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .scroll-cue,
-  .scroll-mouse-dot {
+  .scroll-hint-arrow {
     animation: none;
   }
 }
