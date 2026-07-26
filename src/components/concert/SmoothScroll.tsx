@@ -23,14 +23,16 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
         const lenis = new Lenis({
-            duration: 1.5, // higher = smoother / longer glide (was 1.15)
-            // easeOutExpo — a long, soft decel to a stop so the wheel glides
-            // instead of feeling "steppy"/hard.
+            // Kept smooth, but far more RESPONSIVE: a short glide + higher wheel
+            // sensitivity so a single scroll moves a meaningful amount right away
+            // (was 1.5s / multiplier 1, which made each scroll feel like nothing
+            // happened until you scrolled several times).
+            duration: 0.9,
             easing: (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)),
             smoothWheel: true,
-            wheelMultiplier: 1,
-            touchMultiplier: 1.5,
-            syncTouch: true, // smooth momentum on trackpads / touch too
+            wheelMultiplier: 1.6,
+            touchMultiplier: 1.8,
+            syncTouch: true,
         });
 
         // Expose the instance so UI (e.g. the back-to-top button) can drive a

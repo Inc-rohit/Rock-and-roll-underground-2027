@@ -9,18 +9,37 @@ import type Lenis from "lenis";
  * so the ride back stays smooth and in sync with the pinned timelines; falls
  * back to native smooth scroll if Lenis isn't mounted (e.g. reduced motion).
  */
+const getLenis = () => (window as unknown as { __lenis?: Lenis }).__lenis;
+
 export default function BackToTop() {
     const [visible, setVisible] = useState(false);
 
     useEffect(() => {
-        const onScroll = () => setVisible(window.scrollY > 700);
+        // Read Lenis's scroll (its own value, which may differ from window.scrollY)
+        // and listen to its scroll event, with native fallback.
+        const onScroll = () => setVisible((getLenis()?.scroll ?? window.scrollY) > 700);
         onScroll();
         window.addEventListener("scroll", onScroll, { passive: true });
-        return () => window.removeEventListener("scroll", onScroll);
+        let lenis: Lenis | undefined;
+        let retry: ReturnType<typeof setInterval> | undefined;
+        const attach = () => {
+            const l = getLenis();
+            if (l && !lenis) {
+                lenis = l;
+                l.on("scroll", onScroll);
+            }
+            return !!lenis;
+        };
+        if (!attach()) retry = setInterval(() => attach() && retry && clearInterval(retry), 300);
+        return () => {
+            window.removeEventListener("scroll", onScroll);
+            if (retry) clearInterval(retry);
+            lenis?.off("scroll", onScroll);
+        };
     }, []);
 
     const toTop = () => {
-        const lenis = (window as unknown as { __lenis?: Lenis }).__lenis;
+        const lenis = getLenis();
         if (lenis) lenis.scrollTo(0, { duration: 1.2 });
         else window.scrollTo({ top: 0, behavior: "smooth" });
     };

@@ -5,7 +5,7 @@
  */
 export default function ConnectWithUs() {
     return (
-        <section className="relative z-[1] overflow-hidden border-t border-white/10 bg-[#6d1710] text-white">
+        <section id="sec-partner" className="relative z-[1] overflow-hidden border-t border-white/10 bg-[#6d1710] text-white">
             {/* Red stage smoke — the concert's cloud video */}
             <video
                 className="pointer-events-none absolute inset-0 h-full w-full object-cover"

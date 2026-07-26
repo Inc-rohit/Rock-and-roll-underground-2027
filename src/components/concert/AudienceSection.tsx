@@ -114,9 +114,9 @@ export default function AudienceSection() {
                 scrollTrigger: {
                     trigger: el,
                     start: "top top",
-                    end: "+=820%",
+                    end: "+=520%",
                     pin: true,
-                    scrub: 1.3,
+                    scrub: 0.5,
                     anticipatePin: 1,
                 },
             });

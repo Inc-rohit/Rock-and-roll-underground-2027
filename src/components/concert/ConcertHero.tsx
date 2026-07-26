@@ -143,9 +143,9 @@ export default function ConcertHero() {
                 scrollTrigger: {
                     trigger: el,
                     start: "top top",
-                    end: "+=950%",
+                    end: "+=600%",
                     pin: true,
-                    scrub: 1.3,
+                    scrub: 0.5,
                     anticipatePin: 1,
                 },
             });

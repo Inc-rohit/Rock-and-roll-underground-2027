@@ -99,7 +99,7 @@ export default function Scene({ sentence, flavor }: SkyDiveProps) {
                 pin: true,
                 start: "top top",
                 end: "+=1200",
-                scrub: 1.5,
+                scrub: 0.6,
             },
         });
 
