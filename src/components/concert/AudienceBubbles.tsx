@@ -1,7 +1,7 @@
 "use client";
 
 import * as THREE from "three";
-import { useRef, useEffect, useMemo } from "react";
+import { useRef, useEffect, useMemo, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment } from "@react-three/drei";
 import gsap from "gsap";
@@ -16,30 +16,24 @@ const PALETTE = [
 ];
 
 /**
- * A field of realistic carbonation bubbles drifting upward on the Sponsor
- * Benefits black backdrop. Each bubble:
- *   - is a glassy physical material (low roughness + clearcoat + iridescence),
- *   - carries a per-instance tint from a red / green / white palette,
- *   - varies in size (a few large, many small),
- *   - and gets a fresnel pass so its CENTRE is see-through while its RIM catches
- *     light — the cue that reads as a hollow bubble rather than a solid ball.
+ * A field of carbonation bubbles drifting upward on the Sponsor Benefits black
+ * backdrop. Each bubble carries a per-instance red / green / white tint, varies
+ * in size, and gets a fresnel pass (see-through centre, lit rim) so it reads as
+ * a hollow bubble. Kept deliberately cheap for scroll performance: a standard
+ * material (no clearcoat/iridescence), capped dpr, and the canvas only runs its
+ * render loop while the section is on screen (see AudienceBubbles).
  */
-function BubbleField({ count = 90 }) {
+function BubbleField({ count = 55 }) {
     const meshRef = useRef<THREE.InstancedMesh>(null);
     const speed = useRef(new Float32Array(count));
     const sizes = useRef(new Float32Array(count));
 
     const material = useMemo(() => {
-        const m = new THREE.MeshPhysicalMaterial({
+        const m = new THREE.MeshStandardMaterial({
             transparent: true,
             opacity: 1,
-            roughness: 0.08,
-            metalness: 0,
-            clearcoat: 1,
-            clearcoatRoughness: 0.12,
-            iridescence: 1,
-            iridescenceIOR: 1.3,
-            iridescenceThicknessRange: [120, 520],
+            roughness: 0.12,
+            metalness: 0.1,
             envMapIntensity: 1.3,
             depthWrite: false,
             side: THREE.DoubleSide,
@@ -108,22 +102,41 @@ function BubbleField({ count = 90 }) {
             material={material}
             frustumCulled={false}
         >
-            <sphereGeometry args={[0.06, 20, 20]} />
+            <sphereGeometry args={[0.06, 14, 14]} />
         </instancedMesh>
     );
 }
 
 export default function AudienceBubbles() {
+    // Only run the (second) WebGL render loop while this section is on screen —
+    // otherwise it renders every frame across the whole page and starves the
+    // scroll. IntersectionObserver flips frameloop on/off.
+    const [active, setActive] = useState(false);
+    const wrapRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const el = wrapRef.current;
+        if (!el) return;
+        const io = new IntersectionObserver(([entry]) => setActive(entry.isIntersecting), {
+            rootMargin: "200px",
+        });
+        io.observe(el);
+        return () => io.disconnect();
+    }, []);
+
     return (
-        <Canvas
-            camera={{ fov: 42, position: [0, 0, 6] }}
-            gl={{ alpha: true }}
-            dpr={[1, 2]}
-        >
-            <BubbleField />
-            <ambientLight intensity={0.8} />
-            <directionalLight position={[3, 4, 5]} intensity={1.4} />
-            <Environment files="/hdr/lobby.hdr" environmentIntensity={0.8} />
-        </Canvas>
+        <div ref={wrapRef} className="h-full w-full">
+            <Canvas
+                frameloop={active ? "always" : "never"}
+                camera={{ fov: 42, position: [0, 0, 6] }}
+                gl={{ alpha: true, powerPreference: "high-performance" }}
+                dpr={1}
+            >
+                <BubbleField />
+                <ambientLight intensity={0.8} />
+                <directionalLight position={[3, 4, 5]} intensity={1.4} />
+                <Environment files="/hdr/lobby.hdr" environmentIntensity={0.8} />
+            </Canvas>
+        </div>
     );
 }

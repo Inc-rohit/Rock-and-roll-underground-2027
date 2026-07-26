@@ -13,14 +13,14 @@ import Image from "next/image";
  */
 const SILHOUETTES = [1, 2, 3, 4, 5];
 
-// Crisp gold outline traced to the silhouette's edge (8 stacked directional
+// Crisp yellow rim traced to the silhouette's edge (8 stacked directional
 // drop-shadows) + a soft dark drop for depth.
-const GOLD = "#f7c600";
-const GOLD_OUTLINE =
-    `drop-shadow(0 -2px 0 ${GOLD}) drop-shadow(0 2px 0 ${GOLD}) ` +
-    `drop-shadow(-2px 0 0 ${GOLD}) drop-shadow(2px 0 0 ${GOLD}) ` +
-    `drop-shadow(-1.4px -1.4px 0 ${GOLD}) drop-shadow(1.4px -1.4px 0 ${GOLD}) ` +
-    `drop-shadow(-1.4px 1.4px 0 ${GOLD}) drop-shadow(1.4px 1.4px 0 ${GOLD}) ` +
+const RIM = "#f7c600";
+const RIM_OUTLINE =
+    `drop-shadow(0 -2px 0 ${RIM}) drop-shadow(0 2px 0 ${RIM}) ` +
+    `drop-shadow(-2px 0 0 ${RIM}) drop-shadow(2px 0 0 ${RIM}) ` +
+    `drop-shadow(-1.4px -1.4px 0 ${RIM}) drop-shadow(1.4px -1.4px 0 ${RIM}) ` +
+    `drop-shadow(-1.4px 1.4px 0 ${RIM}) drop-shadow(1.4px 1.4px 0 ${RIM}) ` +
     `drop-shadow(0 8px 26px rgba(0,0,0,0.6))`;
 
 export default function MusiciansLayer() {
@@ -46,11 +46,13 @@ export default function MusiciansLayer() {
                                 maskRepeat: "no-repeat",
                                 WebkitMaskPosition: "center",
                                 maskPosition: "center",
-                                background: "linear-gradient(180deg, #ffe79a 0%, #f7a300 100%)",
+                                background: "linear-gradient(180deg, #ff6a4a 0%, #b01010 100%)",
                                 filter: "blur(11px)",
                                 mixBlendMode: "screen",
                             }}
                         />
+                        {/* the crisp figure — provides sizing + the gold outline;
+                            its black fill is covered by the animated gradient below */}
                         <Image
                             src={`/stage/silhouette-${n}.png`}
                             alt=""
@@ -58,8 +60,27 @@ export default function MusiciansLayer() {
                             height={695}
                             draggable={false}
                             className="relative h-full w-auto object-contain"
-                            style={{ filter: GOLD_OUTLINE }}
+                            style={{ filter: RIM_OUTLINE }}
                         />
+                        {/* animated red gradient flowing INSIDE the figure (masked
+                            to the silhouette). The flow is a GPU-composited
+                            transform on the inner layer (no per-frame repaint),
+                            staggered per band member. */}
+                        <div
+                            className="musician-fill pointer-events-none absolute inset-0 overflow-hidden"
+                            style={{
+                                WebkitMaskImage: `url(/stage/silhouette-${n}.png)`,
+                                maskImage: `url(/stage/silhouette-${n}.png)`,
+                                WebkitMaskSize: "contain",
+                                maskSize: "contain",
+                                WebkitMaskRepeat: "no-repeat",
+                                maskRepeat: "no-repeat",
+                                WebkitMaskPosition: "center",
+                                maskPosition: "center",
+                            }}
+                        >
+                            <div className="musician-fill-inner" style={{ animationDelay: `${n * 0.7}s` }} />
+                        </div>
                     </div>
                 </div>
             ))}

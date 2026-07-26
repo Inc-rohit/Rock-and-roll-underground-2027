@@ -20,9 +20,13 @@ export default function Scene({ }: Props) {
 
     useGSAP(
         () => {
-            if (!canRef.current) return;
+            const can = canRef.current;
+            if (!can) return;
 
-            const sections = gsap.utils.toArray(".alternating-section");
+            const sections = gsap.utils.toArray<HTMLElement>(".alternating-section");
+            if (!sections.length) return;
+
+            gsap.set(can.scale, { x: 1, y: 1, z: 1 });
 
             const scrollTl = gsap.timeline({
                 scrollTrigger: {
@@ -35,26 +39,26 @@ export default function Scene({ }: Props) {
                 },
             });
 
+            // Smooth glide + tilt: the can stays on screen the whole time and
+            // glides side-to-side WITH the scroll — leaning into the direction of
+            // travel (z-tilt that peaks mid-glide and straightens) and settling
+            // with a slight turn toward the active block (y). Continuous & scrubbed,
+            // so there's no pop timing to mis-fire; it rests at each block, then
+            // glides across to the next.
             sections.forEach((_, index) => {
-                if (!canRef.current) return;
                 if (index === 0) return;
 
                 const isOdd = index % 2 !== 0;
+                const xPosition = isDesktop ? (isOdd ? -1 : 1) : 0;
+                const yLean = isDesktop ? (isOdd ? 0.4 : -0.4) : 0;
+                const tilt = isDesktop ? (isOdd ? 0.22 : -0.22) : 0;
 
-                const xPosition = isDesktop ? (isOdd ? "-1" : "1") : 0;
-                const yRotation = isDesktop ? (isOdd ? ".4" : "-.4") : 0;
                 scrollTl
-                    .to(canRef.current.position, {
-                        x: xPosition,
-                        ease: "circ.inOut",
-                        delay: 0.5,
-                    })
+                    .to(can.position, { x: xPosition, duration: 1, ease: "power2.inOut", delay: 0.5 })
+                    .to(can.rotation, { y: yLean, duration: 1, ease: "power2.inOut" }, "<")
                     .to(
-                        canRef.current.rotation,
-                        {
-                            y: yRotation,
-                            ease: "back.inOut",
-                        },
+                        can.rotation,
+                        { z: tilt, duration: 0.5, ease: "sine.inOut", yoyo: true, repeat: 1 },
                         "<",
                     );
             });

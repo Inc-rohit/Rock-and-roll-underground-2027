@@ -90,6 +90,50 @@ html.lenis body {
   transform: scale(calc(1 + var(--bass, 0) * 0.14));
 }
 
+/* Musician silhouettes — a gold gradient that flows vertically INSIDE each
+   figure (the div is masked to the silhouette), so the band reads as glowing,
+   living forms instead of flat black cut-outs. */
+.musician-fill-inner {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 300%;
+  background: linear-gradient(
+    155deg,
+    #060000 0%,
+    #060000 24%,
+    #5a0a0a 30%,
+    #e0201a 34%,
+    #5a0a0a 38%,
+    #060000 44%,
+    #060000 80%,
+    #5a0a0a 85%,
+    #ff2a1a 89%,
+    #5a0a0a 93%,
+    #060000 100%
+  );
+  will-change: transform;
+  animation: musician-flow 5.5s ease-in-out infinite;
+}
+/* Composited flow — translate the tall gradient layer (no repaint) so the red
+   sweeps vertically through the masked silhouette. */
+@keyframes musician-flow {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -66.6%, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .musician-fill-inner {
+    animation: none;
+    transform: translate3d(0, -33%, 0);
+  }
+}
+
 /* Scroll-to-explore prompt — a bouncing double chevron so first-time visitors
    immediately see the page is a long scroll experience. */
 .scroll-hint-arrow {

@@ -26,7 +26,7 @@ export default function ViewCanvas({ }: Props) {
                     pointerEvents: "none",
                     zIndex: 30
                 }}
-                dpr={[1, 1.25]}
+                dpr={1}
                 gl={{ antialias: true, powerPreference: "high-performance" }}
                 camera={{
                     fov: 30,
