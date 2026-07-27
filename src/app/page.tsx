@@ -6,10 +6,36 @@ import SkyDiveSection from "@/components/concert/SkyDiveSection";
 import AlternatingTextSection from "@/components/concert/AlternatingTextSection";
 import SmoothScroll from "@/components/concert/SmoothScroll";
 
+const SITE_URL = "https://rock-and-roll-underground-2027.vercel.app";
+const TITLE = "Rock & Roll Underground 2027 — The Cutting Room";
+const DESCRIPTION =
+  "The most exciting event at NRF 2027. The Cutting Room, New York · January 11, 2027 · 8:30 PM.";
+
 export const metadata: Metadata = {
-  title: "Rock & Roll Underground 2027 — The Cutting Room",
-  description:
-    "Rock & Roll Underground 2027. The Cutting Room · January 11, 2027.",
+  metadataBase: new URL(SITE_URL),
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: SITE_URL,
+    siteName: "Rock & Roll Underground 2027",
+    type: "website",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "Rock & Roll Underground 2027 — The Cutting Room · January 11, 2027 · 8:30 PM",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ["/og.png"],
+  },
 };
 
 /**
