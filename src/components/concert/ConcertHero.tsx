@@ -56,7 +56,9 @@ export default function ConcertHero() {
 
             gsap.set(panels, { autoAlpha: 0, yPercent: 12 });
             gsap.set(panels[0], { autoAlpha: 1, yPercent: 0 }); // logo visible at the top
-            gsap.set(sil, { xPercent: -50, x: 0, y: 80, autoAlpha: 0 });
+            // Start each silhouette already at its final line-up position, just
+            // below the floor + hidden — so they rise straight up in place.
+            gsap.set(sil, { xPercent: -50, x: (i: number) => fx[i], y: 80, autoAlpha: 0 });
             gsap.set(".crowd-layer", { autoAlpha: 0, yPercent: 18 });
 
             // Intro (first load, once): a proper rock-show power-up —
@@ -176,29 +178,10 @@ export default function ConcertHero() {
             tl.to(panels[3], { duration: 0.4 });
             tl.to(panels[3], { yPercent: -34, scale: 0.62, duration: 1.6, ease: "power2.inOut" });
 
-            // 6) Silhouettes rise — only AFTER the logo has finished moving up
-            //    (sequential, so the first figure never appears behind the logo).
-            tl.to(sil[0], { autoAlpha: 1, y: 0, duration: 0.8 });
-            tl.to(sil[0], { duration: 0.3 });
-            for (let i = 1; i < sil.length; i++) {
-                tl.to(sil[i], { autoAlpha: 1, y: 0, duration: 0.8 }, ">");
-                tl.to(sil[i - 1], { autoAlpha: 0, y: -24, duration: 0.8, ease: "power2.in" }, "<");
-                tl.to(sil[i], { duration: 0.3 });
-            }
-
-            // Fan-out: the line settles into numeric left→right order (#1 … #5).
-            // #5 was the last solo figure at centre — slide it out to its far-right
-            // spot while #3 rises at the centre and #1 #2 #4 emerge from behind.
-            tl.addLabel("fan");
-            tl.to(sil[4], { x: fx[4], y: 0, autoAlpha: 1, duration: 1.3, ease: "power3.inOut" }, "fan");
-            [2, 0, 1, 3].forEach((idx) => {
-                tl.fromTo(
-                    sil[idx],
-                    { x: 0, y: 30, autoAlpha: 0 },
-                    { x: fx[idx], y: 0, autoAlpha: 1, duration: 1.3, ease: "power3.inOut" },
-                    "fan",
-                );
-            });
+            // 6) Silhouettes ALL rise straight up TOGETHER, each already at its
+            //    final line-up position (no centre cluster, no one-by-one) — after
+            //    the logo has finished moving up.
+            tl.to(sil, { autoAlpha: 1, y: 0, duration: 1.0, ease: "power2.out", stagger: 0.05 });
             tl.to({}, { duration: 0.6 }); // hold the finished line-up
 
             // --- Scroll-scrubbed stage video + subtle push ---

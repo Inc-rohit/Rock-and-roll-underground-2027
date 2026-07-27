@@ -2,30 +2,41 @@
 
 import { useEffect, useRef, useState } from "react";
 import type Lenis from "lenis";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 /**
- * Scroll affordances so visitors grasp that the page is a long, scroll-driven
- * experience — and can see where they are / jump around:
- *   1. side SECTION DOTS on the right edge — one per act; the current act's dot
- *      is filled gold, and clicking a dot smooth-scrolls to that section.
- *   2. a "Scroll to explore" prompt at the bottom of the first screen that
- *      persists until the visitor starts scrolling, then fades (returns at top).
- *
- * Reads Lenis's scroll (the same signal ScrollTrigger uses) and subscribes to
- * its scroll event so the indicators stay in lockstep with the experience even
- * during smooth/programmatic scrolls; falls back to the native window scroll.
- * The active section is detected by each section's viewport position, which is
- * robust for the pinned sections (a pinned act sits at top:0 while it's active).
+ * Scroll affordances:
+ *   1. side NAV DOTS on the right edge — each resolves to an absolute scroll
+ *      position (recomputed live, so it tracks the pinned-section geometry).
+ *      "About" and "Sponsor Benefits" are two points WITHIN the pinned audience
+ *      section: its start (the 16th-Annual / about copy) and its 2-cans finale
+ *      near the end. Clicking a dot smooth-scrolls there; the current one is gold.
+ *   2. a "Scroll to explore" prompt on the first screen that fades once scrolling.
  */
-const SECTIONS = [
-    { sel: ".concert-hero", label: "Concert" },
-    { sel: ".audience-section", label: "Sponsor Benefits" },
-    { sel: ".skydive", label: "Feel the Rush" },
-    { sel: ".sponsor-tiers", label: "Sponsor Tiers" },
-    { sel: "#sec-partner", label: "Partner With Us" },
-];
-
 const getLenis = () => (window as unknown as { __lenis?: Lenis }).__lenis;
+const getScroll = () => getLenis()?.scroll ?? window.scrollY;
+
+const scrollTopOf = (sel: string): number | null => {
+    const el = document.querySelector(sel);
+    if (!el) return null;
+    return el.getBoundingClientRect().top + getScroll();
+};
+const audienceST = () =>
+    ScrollTrigger.getAll().find((st) => st.trigger === document.querySelector(".audience-section"));
+// A position inside the audience section's pinned scroll range (0 = start,
+// 1 = end). Falls back to the section top before the trigger is built.
+const audiencePos = (frac: number): number | null => {
+    const st = audienceST();
+    if (st) return st.start + (st.end - st.start) * frac;
+    return scrollTopOf(".audience-section");
+};
+
+const NAV: { label: string; pos: () => number | null }[] = [
+    { label: "Concert", pos: () => scrollTopOf(".concert-hero") },
+    { label: "About", pos: () => audiencePos(0) },
+    { label: "Sponsor Benefits", pos: () => audiencePos(0.96) },
+    { label: "Partner With Us", pos: () => scrollTopOf("#sec-partner") },
+];
 
 export default function ScrollGuide() {
     const hintRef = useRef<HTMLDivElement>(null);
@@ -37,15 +48,15 @@ export default function ScrollGuide() {
         let pending = false;
         const apply = () => {
             pending = false;
-            const scroll = getLenis()?.scroll ?? window.scrollY;
+            const scroll = getScroll();
             if (hintRef.current)
                 hintRef.current.style.opacity = scroll > window.innerHeight * 0.45 ? "0" : "1";
-            // active = last section whose top has reached ~35% up the viewport.
+            // active = the last dot whose target we've reached (within ~0.4 screen).
+            const offset = window.innerHeight * 0.4;
             let idx = 0;
-            const trigger = window.innerHeight * 0.35;
-            for (let i = 0; i < SECTIONS.length; i++) {
-                const el = document.querySelector(SECTIONS[i].sel);
-                if (el && el.getBoundingClientRect().top <= trigger) idx = i;
+            for (let i = 0; i < NAV.length; i++) {
+                const p = NAV[i].pos();
+                if (p != null && p <= scroll + offset) idx = i;
             }
             if (idx !== activeRef.current) {
                 activeRef.current = idx;
@@ -62,8 +73,6 @@ export default function ScrollGuide() {
         window.addEventListener("scroll", onScroll, { passive: true });
         window.addEventListener("resize", onScroll);
 
-        // Subscribe to Lenis's scroll event too (handles the mount-order race
-        // with a short retry, since SmoothScroll sets window.__lenis separately).
         let lenis: Lenis | undefined;
         let retry: ReturnType<typeof setInterval> | undefined;
         const attach = () => {
@@ -85,27 +94,26 @@ export default function ScrollGuide() {
         };
     }, []);
 
-    const jump = (sel: string) => {
-        const el = document.querySelector(sel);
-        if (!el) return;
+    const jump = (i: number) => {
+        const p = NAV[i].pos();
+        if (p == null) return;
         const lenis = getLenis();
-        const top = el.getBoundingClientRect().top + (lenis?.scroll ?? window.scrollY);
-        if (lenis) lenis.scrollTo(top, { duration: 1.0 });
-        else window.scrollTo({ top, behavior: "smooth" });
+        if (lenis) lenis.scrollTo(p, { duration: 1.0 });
+        else window.scrollTo({ top: p, behavior: "smooth" });
     };
 
     return (
         <>
-            {/* side section dots */}
+            {/* side nav dots */}
             <nav
                 aria-label="Sections"
                 className="fixed right-5 top-1/2 z-[140] hidden -translate-y-1/2 flex-col items-end gap-3.5 md:flex"
             >
-                {SECTIONS.map((s, i) => (
+                {NAV.map((s, i) => (
                     <button
-                        key={s.sel}
+                        key={s.label}
                         type="button"
-                        onClick={() => jump(s.sel)}
+                        onClick={() => jump(i)}
                         aria-label={`Go to ${s.label}`}
                         aria-current={active === i}
                         className="group flex items-center gap-2.5"
